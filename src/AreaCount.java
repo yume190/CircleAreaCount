@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class AreaCount {
 	//總格子量 = len * wid
@@ -9,7 +10,7 @@ public class AreaCount {
 	//格子長和寬的單位
 	private double scale;
 	//
-	private int optimizationFlag;
+	//private int optimizationFlag;
 	
 	//the bound of the circle (up down left right)
 	//圓的邊界 (上下左右)
@@ -26,6 +27,43 @@ public class AreaCount {
 		wid = (int)(width/this.scale);
 		this.scope = new int[len][wid];
 	}
+	
+	public double getCoverageRate(){
+		return (double)this.getCoverageAmount() / this.getScopeAmount();
+	}
+	
+	public int getScopeAmount(){
+		return this.len * this.wid;
+	}
+	
+	public int getCoverageAmount(){
+		int sum = 0;
+		for(int a = 0;a < this.scope.length;a++){
+			for(int b = 0;b < this.scope[a].length;b++){
+				if(this.scope[a][b] == 0);
+				else
+					sum += 1;
+			}
+		}
+		return sum;
+	}
+	
+	public Integer[] getCoverageAmountDetail(){
+		ArrayList<Integer> sum = new ArrayList<Integer>();
+		sum.add(0);
+		for(int a = 0;a < this.scope.length;a++){
+			for(int b = 0;b < this.scope[a].length;b++){
+				if(this.scope[a][b] > sum.size() - 1)
+					for(int count = 0;count <= this.scope[a][b] - sum.size() + 1;count++)
+						sum.add(0);
+				sum.set(this.scope[a][b],sum.get(this.scope[a][b])+1);
+			}
+		}
+		//for(int a = 0;a <sum.size();a++)
+			//System.out.println("The coverage [" + a + "] : " + sum.get(a));
+		return sum.toArray(new Integer[sum.size()]);
+	}
+	
 	/**
 	 * 清空全部格子資料
 	 */
@@ -35,7 +73,7 @@ public class AreaCount {
 	
 	////////////////////////////////////////////////////////////////
 	public void show(){
-		this.scope[0][9]=1;
+		//this.scope[0][9]=1;
 		System.out.println(this.upBound);
 		System.out.println(this.downBound);
 		System.out.println(this.leftBound);
@@ -52,11 +90,8 @@ public class AreaCount {
 		double centerX = xx / scale;
 		double centerY = yy / scale;
 		double radius = rad / scale;
-		
 		this.centerOfNewCircle = new Point(xx,yy);
-		
 		setBound(centerX,centerY,radius);
-		
 		paintCircle(centerX,centerY,radius);
 	}
 	
@@ -118,10 +153,36 @@ public class AreaCount {
 			}
 		}
 	}
-	private void paintCircleRU(double centerX,double centerY,double radius){}
-	private void paintCircleLD(double centerX,double centerY,double radius){}
-	private void paintCircleRD(double centerX,double centerY,double radius){}
-	
+	private void paintCircleRU(double centerX,double centerY,double radius){
+		for(int yStart = upBound;yStart >= (int)centerY;yStart--){
+			for(int xStart = (int)centerX;xStart <= rightBound;xStart++){
+				if(inCircle(this.getRightUpPoint(xStart, yStart),radius))
+					this.scope[xStart][yStart] += 1;
+				//else
+					//break;
+			}
+		}
+	}
+	private void paintCircleLD(double centerX,double centerY,double radius){
+		for(int yStart = downBound;yStart < (int)centerY;yStart++){
+			for(int xStart = (int)centerX-1;xStart >= leftBound;xStart--){
+				if(inCircle(this.getLeftDownPoint(xStart, yStart),radius))
+					this.scope[xStart][yStart] += 1;
+				//else
+					//break;
+			}
+		}
+	}
+	private void paintCircleRD(double centerX,double centerY,double radius){
+		for(int yStart = downBound;yStart < (int)centerY;yStart++){
+			for(int xStart = (int)centerX;xStart <= rightBound;xStart++){
+				if(inCircle(this.getRightDownPoint(xStart, yStart),radius))
+					this.scope[xStart][yStart] += 1;
+				//else
+					//break;
+			}
+		}
+	}
 	
 	private Point getLeftUpPoint(double xx, double yy){
 		return new Point(xx*scale,yy*scale+scale);
@@ -142,14 +203,13 @@ public class AreaCount {
 	private boolean inCircle(Point zone,double c){
 		double a = Math.pow(this.centerOfNewCircle.getX() - zone.getX() ,2);
 		double b = Math.pow(this.centerOfNewCircle.getY() - zone.getY() ,2);
+		c = c * this.scale;
 		c = c * c;
 		if(a + b <= c)
 			return true;
 		else
 			return false;
 	}
-	
-	
 	
 	public class Point{
 		
