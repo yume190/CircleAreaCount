@@ -1,19 +1,19 @@
 import java.util.ArrayList;
 
 public class AreaCount {
-	//ç¸½æ ¼å­é‡ = len * wid
+	//Á`®æ¤l¶q = len * wid
 	private int scope[][];
-	//å·¦å³æ ¼å­æ•¸
+	//¥ª¥k®æ¤l¼Æ
 	private int len;
-	//ä¸Šä¸‹æ ¼å­æ•¸
+	//¤W¤U®æ¤l¼Æ
 	private int wid;
-	//æ ¼å­é•·å’Œå¯¬çš„å–®ä½
+	//®æ¤lªø©M¼eªº³æ¦ì
 	private double scale;
 	//
 	//private int optimizationFlag;
 	
 	//the bound of the circle (up down left right)
-	//åœ“çš„é‚Šç•Œ (ä¸Šä¸‹å·¦å³)
+	//¶êªºÃä¬É (¤W¤U¥ª¥k)
 	private int upBound;
 	private int downBound;
 	private int leftBound;
@@ -65,7 +65,7 @@ public class AreaCount {
 	}
 	
 	/**
-	 * æ¸…ç©ºå…¨éƒ¨æ ¼å­è³‡æ–™
+	 * ²MªÅ¥þ³¡®æ¤l¸ê®Æ
 	 */
 	public void flush(){
 		this.scope = new int[len][wid];
@@ -74,10 +74,12 @@ public class AreaCount {
 	////////////////////////////////////////////////////////////////
 	public void show(){
 		//this.scope[0][9]=1;
+		/*
 		System.out.println(this.upBound);
 		System.out.println(this.downBound);
 		System.out.println(this.leftBound);
 		System.out.println(this.rightBound);
+		*/
 		for(int a = this.scope.length-1; a >= 0 ;a--){
 			for(int b = 0;b < this.scope[a].length;b++){
 				System.out.print(scope[b][a]);
@@ -146,7 +148,8 @@ public class AreaCount {
 		for(int yStart = upBound;yStart >= (int)centerY;yStart--){
 			//////////////////////////////////-1
 			for(int xStart = (int)centerX - 1;xStart >= leftBound;xStart--){
-				if(inCircle(this.getLeftUpPoint(xStart, yStart),radius))
+				//if(inCircle(this.getLeftUpPoint(xStart, yStart),radius))
+				if(inCircle(this.getCenterPoint(xStart, yStart),radius))
 					this.scope[xStart][yStart] += 1;
 				//else
 					//break;
@@ -156,7 +159,8 @@ public class AreaCount {
 	private void paintCircleRU(double centerX,double centerY,double radius){
 		for(int yStart = upBound;yStart >= (int)centerY;yStart--){
 			for(int xStart = (int)centerX;xStart <= rightBound;xStart++){
-				if(inCircle(this.getRightUpPoint(xStart, yStart),radius))
+				//if(inCircle(this.getRightUpPoint(xStart, yStart),radius))
+				if(inCircle(this.getCenterPoint(xStart, yStart),radius))
 					this.scope[xStart][yStart] += 1;
 				//else
 					//break;
@@ -166,7 +170,8 @@ public class AreaCount {
 	private void paintCircleLD(double centerX,double centerY,double radius){
 		for(int yStart = downBound;yStart < (int)centerY;yStart++){
 			for(int xStart = (int)centerX-1;xStart >= leftBound;xStart--){
-				if(inCircle(this.getLeftDownPoint(xStart, yStart),radius))
+				//if(inCircle(this.getLeftDownPoint(xStart, yStart),radius))
+				if(inCircle(this.getCenterPoint(xStart, yStart),radius))
 					this.scope[xStart][yStart] += 1;
 				//else
 					//break;
@@ -176,7 +181,8 @@ public class AreaCount {
 	private void paintCircleRD(double centerX,double centerY,double radius){
 		for(int yStart = downBound;yStart < (int)centerY;yStart++){
 			for(int xStart = (int)centerX;xStart <= rightBound;xStart++){
-				if(inCircle(this.getRightDownPoint(xStart, yStart),radius))
+				//if(inCircle(this.getRightDownPoint(xStart, yStart),radius))
+				if(inCircle(this.getCenterPoint(xStart, yStart),radius))
 					this.scope[xStart][yStart] += 1;
 				//else
 					//break;
@@ -198,6 +204,10 @@ public class AreaCount {
 	
 	private Point getRightDownPoint(double xx, double yy){
 		return new Point(xx*scale+scale,yy*scale);
+	}
+	
+	private Point getCenterPoint(double xx, double yy){
+		return new Point(xx * scale + 0.5 * scale,yy * scale + 0.5 * scale);
 	}
 	
 	private boolean inCircle(Point zone,double c){
